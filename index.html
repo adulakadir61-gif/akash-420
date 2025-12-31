@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wingo Analyzer – Ultimate</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;font-family:'Roboto',sans-serif;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:12px;
+background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#141e30,#243b55);
+background-size:500% 500%;animation:bgMove 14s ease infinite;color:#fff}
+@keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.page{display:none;width:100%;max-width:500px;padding:22px;border-radius:22px;
+background:rgba(255,255,255,.15);backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,.25);
+box-shadow:0 20px 40px rgba(0,0,0,.45)}
+h2{text-align:center;color:#fff;margin-bottom:10px;text-shadow:0 0 8px cyan}
+input,button,select{width:100%;padding:12px;margin-top:10px;border-radius:14px;font-size:15px;border:none}
+input{background:#fff}
+button{cursor:pointer;font-weight:600}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff}
+.btn-secondary{background:linear-gradient(135deg,#555,#222);color:#fff}
+.center{text-align:center;color:#fff;margin-top:8px}
+.toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:13px;color:#000}
+.server-btn{height:60px;border-radius:50px;font-size:18px;margin-top:16px;display:flex;align-items:center;justify-content:center;color:#fff}
+.hgzy{background:linear-gradient(135deg,#00f260,#0575e6)}
+.dkwin{background:linear-gradient(135deg,#f7971e,#ffd200)}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.stat div{background:#fff;padding:8px;border-radius:10px;text-align:center;font-weight:600;color:#000}
+.bar{height:18px;border-radius:10px;margin-top:6px}
+.win{background:#38a169}
+.loss{background:#e53e3e}
+#history{max-height:140px;overflow:auto;margin-top:10px}
+#history div{padding:6px;border-radius:8px;color:#fff;margin-bottom:6px;text-align:center}
+.card{background:rgba(255,255,255,.9);border-radius:12px;padding:10px;margin-top:10px;font-size:14px;color:#000}
+#timer{color:#ffeb3b;font-weight:bold;text-align:center;margin-top:6px}
+.small{color:#2b6cb0;font-weight:700}
+.big{color:#c53030;font-weight:700}
+.profile-img{width:80px;height:80px;border-radius:50%;object-fit:cover;margin:auto;display:block;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="page" id="pLogin" style="display:block">
+<h2>Login</h2>
+<input id="liUser" placeholder="Username or Mobile">
+<div style="position:relative">
+<input id="liPass" type="password" placeholder="Password">
+<span class="toggle" onclick="toggle('liPass',this)">Show</span>
+</div>
+<button class="btn-primary" onclick="login()">Login</button>
+<button class="btn-secondary" onclick="go('pSignup')">Signup</button>
+<p id="msgL" class="center"></p>
+</div>
+
+<!-- SIGNUP -->
+<div class="page" id="pSignup">
+<h2>Signup</h2>
+<input id="suName" placeholder="Full Name">
+<input id="suUser" placeholder="Username">
+<input id="suEmail" placeholder="Email">
+<input id="suMobile" placeholder="Mobile">
+<div style="position:relative">
+<input id="suPass" type="password" placeholder="Password">
+<span class="toggle" onclick="toggle('suPass',this)">Show</span>
+</div>
+<div style="position:relative">
+<input id="suCPass" type="password" placeholder="Confirm Password">
+<span class="toggle" onclick="toggle('suCPass',this)">Show</span>
+</div>
+<button class="btn-primary" onclick="signup()">Signup</button>
+<button class="btn-secondary" onclick="go('pLogin')">Back</button>
+<p id="msgS" class="center"></p>
+</div>
+
+<!-- USER PROFILE -->
+<div class="page" id="pProfile">
+<h2>User Profile</h2>
+<img src="" id="profileImg" class="profile-img" alt="Profile">
+<input type="file" id="profileUpload" accept="image/*">
+<input id="profileName" placeholder="Full Name">
+<input id="profileUser" placeholder="Username">
+<input id="profileEmail" placeholder="Email">
+<input id="profileMobile" placeholder="Mobile">
+<button class="btn-primary" onclick="saveProfile()">Update Profile</button>
+<button class="btn-secondary" onclick="go('pServer')">Back</button>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="pAdmin">
+<h2>🔐 Admin Panel</h2>
+<input id="adminPin" placeholder="Admin PIN">
+<button class="btn-primary" onclick="loginAdmin()">Login</button>
+<div id="adminBox" style="display:none">
+<div class="card">
+<b>⏱ Lock Time</b>
+<input type="number" id="lockInput">
+<button class="btn-primary" onclick="saveLock()">Save</button>
+</div>
+<div class="card">
+<b>🎯 Bias Mode</b>
+<select id="biasSelect">
+<option value="neutral">Neutral</option>
+<option value="softBig">Soft Big</option>
+<option value="softSmall">Soft Small</option>
+</select>
+<button class="btn-primary" onclick="saveBias()">Apply</button>
+<p id="biasTxt"></p>
+</div>
+<div class="card">
+<b>🔁 Auto Bias Shift</b>
+<button class="btn-primary" onclick="toggleAuto()">Toggle Auto Shift</button>
+<p id="autoTxt"></p>
+</div>
+<div class="card">
+<b>🔁 Bias History</b>
+<div id="biasHistory"></div>
+</div>
+<hr>
+<h3>🔐 Super Admin</h3>
+<input id="superPin" placeholder="Super Admin PIN">
+<button class="btn-primary" onclick="loginSuper()">Unlock</button>
+<div id="superBox" style="display:none">
+<div class="card">
+<b>⚙ Change Admin PIN</b>
+<input id="newAdminPin" placeholder="New Admin PIN">
+<button class="btn-primary" onclick="changeAdminPin()">Change</button>
+</div>
+<div class="card">
+<b>🧹 Factory Reset</b>
+<button class="btn-primary" onclick="factoryReset()">Reset All</button>
+</div>
+</div>
+</div>
+
+<!-- SERVER -->
+<div class="page" id="pServer">
+<h2>Select Server</h2>
+<button class="server-btn hgzy" onclick="selectServer('HGZY')">HGZY SERVER</button>
+<button class="server-btn dkwin" onclick="selectServer('DKWIN')">DKWIN SERVER</button>
+<button class="btn-secondary" onclick="go('pProfile')">Profile</button>
+<button class="btn-secondary" onclick="go('pLogin')">Logout</button>
+</div>
+
+<!-- RESULT -->
+<div class="page" id="pResult">
+<h2 id="serverTitle"></h2>
+<input id="num" maxlength="1" placeholder="Enter 0–9">
+<button id="btnResult" class="btn-primary" onclick="showResult()">Show Result</button>
+
+<div id="resultText" class="center"></div>
+<div id="timer"></div>
+
+<div class="stat">
+<div id="wC">Win: 0</div>
+<div id="lC">Loss: 0</div>
+<div id="wP">Win %: 0%</div>
+<div id="lP">Loss %: 0%</div>
+</div>
+
+<div class="bar win" id="winBar"></div>
+<div class="bar loss" id="lossBar"></div>
+
+<button id="btnWin" class="btn-primary" onclick="addResult('Win')">Win</button>
+<button id="btnLoss" class="btn-secondary" onclick="addResult('Loss')">Loss</button>
+
+<div class="center" id="streakText"></div>
+
+<div class="card"><b>📊 Probability</b><br>Small: <span id="pS">50%</span> | Big: <span id="pB">50%</span></div>
+<div class="card"><b>🔁 Last 6 Bias:</b> <span id="biasText">Neutral</span></div>
+<div class="card"><b>🧪 Fairness:</b> <span id="fairText">N/A</span></div>
+
+<div id="history"></div>
+
+<button class="btn-secondary" onclick="clearHistory()">Clear</button>
+<button class="btn-secondary" onclick="go('pServer')">Back</button>
+</div>
+
+<script>
+let user=JSON.parse(localStorage.getItem("user"));
+let data=JSON.parse(localStorage.getItem("serverData"))||{};
+let server="",lock=false;
+let lockTime=parseInt(localStorage.getItem("lockTime"))||15;
+let bias=localStorage.getItem("bias")||"neutral";
+let autoShift=localStorage.getItem("autoShift")==="true";
+let biasLog=JSON.parse(localStorage.getItem("biasLog")||"[]");
+let streak=JSON.parse(localStorage.getItem("streak")||"{w:0,l:0}");
+let ADMIN_PIN=localStorage.getItem("ADMIN_PIN")||"1234";
+let SUPER_PIN=localStorage.getItem("SUPER_PIN")||"9999";
+
+/* NAVIGATION */
+function go(id){document.querySelectorAll(".page").forEach(p=>p.style.display="none");document.getElementById(id).style.display="block";}
+function toggle(id,el){let i=document.getElementById(id);i.type=i.type==="password"?"text":"password";el.innerText=i.type==="password"?"Show":"Hide";}
+
+/* LOGIN/SIGNUP */
+function signup(){
+if(suPass.value!==suCPass.value){msgS.innerText="Password mismatch";return}
+let newUser={name:suName.value,user:suUser.value,email:suEmail.value,mobile:suMobile.value,pass:suPass.value,img:""};
+localStorage.setItem("user",JSON.stringify(newUser));
+msgS.innerText="Signup success";
+setTimeout(()=>go('pLogin'),800);
+}
+function login(){
+let u=JSON.parse(localStorage.getItem("user"));
+if(!u){msgL.innerText="Signup first";return}
+if((liUser.value===u.user||liUser.value===u.mobile)&&liPass.value===u.pass){
+user=u;
+go('pServer');
+loadProfile();
+}else msgL.innerText="Wrong info";
+}
+
+/* PROFILE */
+function loadProfile(){let u=JSON.parse(localStorage.getItem("user"));if(!u) return;profileName.value=u.name;profileUser.value=u.user;profileEmail.value=u.email;profileMobile.value=u.mobile;if(u.img) profileImg.src=u.img;}
+document.getElementById("profileUpload").addEventListener("change",e=>{let reader=new FileReader();reader.onload=()=>{profileImg.src=reader.result;profileImg.dataset.base64=reader.result;};reader.readAsDataURL(e.target.files[0]);});
+function saveProfile(){let u=JSON.parse(localStorage.getItem("user"));u.name=profileName.value;u.user=profileUser.value;u.email=profileEmail.value;u.mobile=profileMobile.value;if(profileImg.dataset.base64) u.img=profileImg.dataset.base64;localStorage.setItem("user",JSON.stringify(u));alert("প্রোফাইল আপডেট হয়েছে");}
+
+/* SERVER & RESULT */
+function selectServer(s){server=s;if(!data[s])data[s]=[];serverTitle.innerText=s+" SERVER";go('pResult');render();}
+function showResult(){if(lock)return;if(num.value===""||num.value<0||num.value>9){alert("0-9 দিন");return}let res=Math.random()<0.5?"Small":"Big";resultText.innerText="Result: "+res;lockButtons(true);startLock();}
+function lockButtons(state){btnResult.disabled=state;btnWin.disabled=state;btnLoss.disabled=state;num.disabled=state;}
+function startLock(){lock=true;let t=lockTime;timer.innerText="Wait: "+t+"s";let i=setInterval(()=>{t--;timer.innerText="Wait: "+t+"s";if(t<=0){clearInterval(i);lock=false;timer.innerText="";lockButtons(false);}},1000);}
+function addResult(v){data[server].unshift(v);localStorage.setItem("serverData",JSON.stringify(data));updateStreak(v);render();}
+function clearHistory(){if(confirm("Clear history?")){data[server]=[];localStorage.setItem("serverData",JSON.stringify(data));render();}}
+
+/* STATS & RENDER */
+function render(){let h=data[server];history.innerHTML=h.map(x=>`<div style="background:${x==='Win'?'#38a169':'#e53e3e'}">${x}</div>`).join("");let w=h.filter(x=>"Win"===x).length,l=h.filter(x=>"Loss"===x).length,t=w+l;wC.innerText="Win: "+w;lC.innerText="Loss: "+l;wP.innerText="Win %: "+(t?(w/t*100).toFixed(1):0)+"%";lP.innerText="Loss %: "+(t?(l/t*100).toFixed(1):0)+"%";winBar.style.width=(t?(w/t*100):0)+"%";lossBar.style.width=(t?(l/t*100):0)+"%";let streakCount=0,cur=null;for(let x of h){if(!cur){cur=x;streakCount=1}else if(x===cur)streakCount++;else break}streakText.innerText=cur?`Streak: ${streakCount} ${cur}`:"";let s=50,b=50;if(h.length){let w=h.filter(x=>"Win"===x).length;s=50+(w-h.length/2);b=100-s}pS.innerText=s.toFixed(1)+"%";pB.innerText=b.toFixed(1)+"%";let last6=h.slice(0,6),wb=last6.filter(x=>"Win"===x).length;biasText.innerText=wb>3?"Win-biased":wb<3?"Loss-biased":"Neutral";fairText.innerText=h.length<10?"N/A":(wb/h.length*100>65||wb/h.length*100<35?"Risky":"Fair");}
+
+/* ADMIN */
+function loginAdmin(){if(adminPin.value===ADMIN_PIN){adminBox.style.display="block";lockInput.value=lockTime;biasSelect.value=bias;render();}else alert("Wrong Admin PIN");}
+function saveLock(){lockTime=+lockInput.value;localStorage.setItem("lockTime",lockTime);}
+function saveBias(){bias=biasSelect.value;saveBiasLog(bias);localStorage.setItem("bias",bias);render();}
+function toggleAuto(){autoShift=!autoShift;localStorage.setItem("autoShift",autoShift);render();}
+function saveBiasLog(b){biasLog.push(b+" @"+new Date().toLocaleTimeString());biasLog=biasLog.slice(-20);localStorage.setItem("biasLog",JSON.stringify(biasLog));}
+
+/* SUPER ADMIN */
+function loginSuper(){if(superPin.value===SUPER_PIN){superBox.style.display="block";}else alert("Wrong Super PIN");}
+function changeAdminPin(){ADMIN_PIN=newAdminPin.value;localStorage.setItem("ADMIN_PIN",ADMIN_PIN);alert("Admin PIN Changed");}
+function factoryReset(){if(confirm("RESET ALL?")){localStorage.clear();location.reload();}}
+
+/* BIAS & STREAK ENGINE */
+function updateStreak(result){if(result==="Win"){streak.w++;streak.l=0;}else{streak.l++;streak.w=0;}if(autoShift){if(streak.w>=3) bias="softSmall";else if(streak.l>=3) bias="softBig";else bias="neutral";localStorage.setItem("bias",bias);saveBiasLog(bias);}localStorage.setItem("streak",JSON.stringify(streak));}
+
+/* ONLOAD */
+loadProfile();
+</script>
+</body>
+</html>
