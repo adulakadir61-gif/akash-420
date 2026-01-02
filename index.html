@@ -162,6 +162,17 @@ display:flex;align-items:center;justify-content:center;color:#fff
 
 <div class="card"><b>📊 Probability</b><br>
 Small: <span id="pS">50%</span> | Big: <span id="pB">50%</span>
+
+</div>
+<div class="card">
+<b>🎯 Bias Control</b><br><br>
+<select id="biasCtrl">
+  <option value="neutral">Neutral</option>
+  <option value="softBig">Soft Big</option>
+  <option value="softSmall">Soft Small</option>
+</select>
+<button class="btn-primary" onclick="setResultBias()">Apply Bias</button>
+<p id="biasNow"></p>
 </div>
 
 <div class="card"><b>🔁 Last 6 Bias:</b> <span id="biasText">Neutral</span></div>
@@ -183,6 +194,18 @@ let autoShift=localStorage.getItem("autoShift")==="true";
 let biasLog=JSON.parse(localStorage.getItem("biasLog")||"[]");
 let streak=JSON.parse(localStorage.getItem("streak")||'{"w":0,"l":0}');
 let ADMIN_PIN=localStorage.getItem("ADMIN_PIN")||"1234";
+
+function setResultBias(){
+  bias = biasCtrl.value;
+  localStorage.setItem("bias", bias);
+  saveBiasLog(bias);
+  renderResultBias();
+}
+
+function renderResultBias(){
+  biasCtrl.value = bias;
+  biasNow.innerText = "Current Bias: " + bias;
+}
 
 /* UTIL */
 function go(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("show"));document.getElementById(id).classList.add("show")}
@@ -240,6 +263,7 @@ biasTxt.innerText="Current Bias: "+bias;
 autoTxt.innerText="Auto Shift: "+(autoShift?"ON":"OFF");
 biasHistory.innerHTML=biasLog.slice().reverse().map(x=>`<div>${x}</div>`).join("")
 }
+renderResultBias();
 </script>
 
 </body>
