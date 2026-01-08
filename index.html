@@ -228,7 +228,28 @@ function factoryReset(){if(confirm("RESET ALL?")){localStorage.clear();location.
 
 /* RESULT */
 function selectServer(s){server=s;if(!data[s])data[s]=[];serverTitle.innerText=s+" SERVER";go('pResult');render()}
-function biasedResult(){let r=Math.random();if(bias==="softBig")return r<0.6?"Big":"Small";if(bias==="softSmall")return r<0.6?"Small":"Big";return r<0.5?"Small":"Big"}
+function biasedResult(){
+  let h = data[server] || [];
+  let last = h.slice(0,5);
+
+  let win = last.filter(x=>x==="Win").length;
+  let loss = last.filter(x=>x==="Loss").length;
+
+  // base probability
+  let bigProb = 50;
+
+  if(win > loss) bigProb = 40;       // বেশি Win হলে Small বেশি
+  else if(loss > win) bigProb = 60;  // বেশি Loss হলে Big বেশি
+
+  // bias effect
+  if(bias === "softBig") bigProb += 10;
+  if(bias === "softSmall") bigProb -= 10;
+
+  // limit safety
+  bigProb = Math.max(20, Math.min(80, bigProb));
+
+  return Math.random()*100 < bigProb ? "Big" : "Small";
+}
 function showResult(){if(lock)return;if(num.value===""||num.value<0||num.value>9){alert("0-9 দিন");return;}
 resultText.innerText="Result: "+biasedResult();lockButtons(true);startLock()}
 function lockButtons(s){btnResult.disabled=s;num.disabled=s}
